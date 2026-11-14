@@ -1,0 +1,17 @@
+[package]
+name = "@deckyard/docker"
+version = "0.1.0"
+description = "A client for the Docker Engine API (and Podman's): containers, images, networks, volumes, exec and system"
+license = "LGPL-3.0-only"
+authors = ["mplx <mplx@jennifer-lang.dev>"]
+# It talks to the Docker Engine API over HTTP(S), so it opens sockets.
+capabilities = ["net"]
+keywords = ["docker", "podman", "containers", "images", "engine-api", "devops"]
+
+[package.urls]
+deck = "https://raw.githubusercontent.com/deckyard/deck-docker/main/deck.toml"
+homepage = "https://github.com/deckyard/deck-docker"
+manual = "https://deckyard.github.io/deck-docker/"
+
+[engines]
+jennifer = ">=0.26.0"
