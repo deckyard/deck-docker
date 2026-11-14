@@ -6,7 +6,7 @@ license = "LGPL-3.0-only"
 authors = ["mplx <mplx@jennifer-lang.dev>"]
 # It talks to the Docker Engine API over HTTP(S), so it opens sockets.
 capabilities = ["net"]
-keywords = ["docker", "podman", "containers", "images", "engine-api", "devops"]
+keywords = ["docker", "podman", "containers", "images", "engine-api", "devops", "iac"]
 
 [package.urls]
 deck = "https://raw.githubusercontent.com/deckyard/deck-docker/main/deck.toml"

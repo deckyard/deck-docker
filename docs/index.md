@@ -9,6 +9,17 @@ which Podman's compatible service serves too. A Jennifer program can run
 throwaway containers, build and pull images, read logs and a stats sample,
 and look after networks and volumes without shelling out to `docker`.
 
+**Infrastructure as Code (IaC).** Containers, images, networks and volumes
+can be provisioned from a Jennifer program kept in version control and
+reviewed like any other code. Not every create verb is idempotent:
+`createContainer` and `createNetwork` fail (409) when the name is taken,
+while `createVolume` returns an existing volume of the same driver unchanged,
+and `pull`, `tagImage` and `build` can be run again. A re-runnable script
+lists what exists first (`containers`, `networks`, `volumes`, `images`, with
+label filters) or inspects by name; `startContainer` reports a container
+that already runs. There is no plan or diff step, no Compose file support,
+and the deck does not detect drift.
+
 - [Connecting](connecting.md): addresses, the API version, proxies, TLS,
   deadlines and caps.
 - [Containers](containers.md): specs, the lifecycle, logs, stats, exec.

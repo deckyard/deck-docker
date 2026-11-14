@@ -12,6 +12,17 @@ version, info and prune; `call` for any other endpoint. It negotiates the
 API version with the daemon, checks names and references before sending,
 and puts a deadline and a cap on every answer.
 
+**Infrastructure as Code (IaC).** Containers, images, networks and volumes
+can be provisioned from a Jennifer program kept in version control and
+reviewed like any other code. Not every create verb is idempotent:
+`createContainer` and `createNetwork` fail (409) when the name is taken,
+while `createVolume` returns an existing volume of the same driver unchanged,
+and `pull`, `tagImage` and `build` can be run again. A re-runnable script
+lists what exists first (`containers`, `networks`, `volumes`, `images`, with
+label filters) or inspects by name; `startContainer` reports a container
+that already runs. There is no plan or diff step, no Compose file support,
+and the deck does not detect drift.
+
 **[Documentation](https://deckyard.github.io/deck-docker/)**
 
 ## Install
