@@ -22,7 +22,9 @@
  * Every failure of kind "docker" is a `DockerError` with the HTTP `status`
  * and the daemon's own `detail`; a response over a cap is kind "limit", a
  * deadline that passed kind "timeout", a connection closed mid-answer kind
- * "closed", a cancelled task kind "cancelled".
+ * "closed", a cancelled task kind "cancelled", and a network failure
+ * (refused, reset, unreachable, DNS, TLS) kind "net", the `net.NetError`
+ * that `http` threw.
  *
  * | topic | covers |
  * | --- | --- |

@@ -62,7 +62,7 @@ docker.removeContainer($c, $id, false, false);
 
 **Why no `unix://` yet.** The daemon's home is its Unix socket, but the
 bundled `http` module speaks HTTP over TCP only, and `net` has no Unix
-sockets either (M28.33). `client("unix://...")` throws a `DockerError`
+sockets either (M30.15). `client("unix://...")` throws a `DockerError`
 saying so, with the two ways around it: expose the socket on loopback TCP,
 or put an https proxy in front of it. The address is the only place a
 transport appears, so when `http` can reach a socket, `unix://` starts
@@ -85,11 +85,15 @@ Every failure of kind `"docker"` is a `docker.DockerError`: a request the
 daemon refused (`status` is its HTTP status, `detail` Docker's own
 `message`), an error the daemon reported inside a 2xx answer (a pull or
 build that failed part way, a wait that ended in an error: `status` 200),
-a malformed answer, an argument the deck refuses before sending, a daemon
-it cannot reach (`status` 0). The generic kinds pass through: a response
-over a cap is `"limit"`, a deadline that passed `"timeout"`, a connection
-closed mid-answer `"closed"`, a cancelled task `"cancelled"`. Match the
-kind and the status, never the message:
+a malformed answer, an argument the deck refuses before sending (`status`
+0). The generic kinds pass through: a response over a cap (or a JSON answer
+nested past the decoder's caps) is `"limit"`, a deadline that passed
+`"timeout"`, a connection closed mid-answer `"closed"`, a cancelled task
+`"cancelled"`, and a daemon the deck cannot reach (refused, reset,
+unreachable, a name that does not resolve, a failed TLS handshake) is
+`"net"`: the `net.NetError` that `http` threw, with `op`, `reason`, `sent`
+and `replied` to read once the kind matches. Match the kind and the status,
+never the message:
 
 ```jennifer
 try {
@@ -125,7 +129,7 @@ the deck uses the one-shot forms only: `logs` reads what is there (no
 `follow`), `stats` takes one sample, and `pull` and `build` read their
 JSON-lines progress once the work is done and report how it ended. Live
 streams (`logs?follow`, `events`, `stats?stream`) wait for streaming
-responses (M28.29). Exec output needs the hijacked connection of
+responses (M30.9). Exec output needs the hijacked connection of
 `exec/start`, so `exec` runs detached and `waitExec` reports the exit
 code; `attach` waits for the same. Compose is client-side, not part of the
 Engine API.

@@ -114,11 +114,12 @@ export def struct Client {
 /**
  * Every failure of kind "docker": a request the daemon refused, a progress
  * stream that ended in an error, a malformed answer, an address or argument
- * the deck refuses, a daemon it cannot reach.
+ * the deck refuses. A daemon it cannot reach is kind "net" instead (a
+ * `net.NetError`).
  *
  * @field kind {string} always "docker"
  * @field message {string} `docker: <request>: <why>`, with ` (HTTP nnn)` when the daemon answered with an error status
- * @field status {int} the HTTP status of the answer (404, 409, 500, ...); 200 when the daemon reported the error inside a 2xx answer (a pull, build or wait); 0 when there was no answer (a refused argument, an unreachable daemon)
+ * @field status {int} the HTTP status of the answer (404, 409, 500, ...); 200 when the daemon reported the error inside a 2xx answer (a pull, build or wait); 0 when there was no answer (a refused argument, a transport failure that is not a network error)
  * @field detail {string} the daemon's own explanation, its JSON `message` (or `error`), `""` when there was none
  */
 export def struct DockerError {
@@ -874,6 +875,10 @@ func exchange(
                     cleaned($e.message, 300)
             };
         }
+        # a network failure is a net.NetError: passed on with its fields
+        if ($e.kind == "net") {
+            throw $e;
+        }
         fail($what + ": cannot reach " + shown($c.address) + ": " + cleaned($e.message, 300));
     }
 }
@@ -950,6 +955,10 @@ func jsonBody(r as http.BytesResponse, what as string) {
     try {
         return json.decode($text);
     } catch (e) {
+        # the decoder's nesting and node caps are a reached cap, kind "limit"
+        if ($e.kind == "limit") {
+            failLimit($what + ": " + cleaned($e.message, 300));
+        }
         fail($what + ": the response is not JSON: " + shown($text));
     }
 }

@@ -12,6 +12,7 @@
  * spliced in here, not standalone suites.
  */
 use httpd;
+use net;
 use testing;
 
 include "topics/fixtures/engine_test.j";

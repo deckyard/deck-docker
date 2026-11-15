@@ -14,7 +14,10 @@ Every failure of kind `"docker"` is a `DockerError` with the HTTP `status`
 (0 when there was no answer, 200 when the daemon reported the error inside a
 2xx answer) and the daemon's own `detail`; a response over a cap is kind
 `"limit"`, a deadline that passed kind `"timeout"`, a connection closed
-mid-answer kind `"closed"`, a cancelled task kind `"cancelled"`. A `c`
+mid-answer kind `"closed"`, a cancelled task kind `"cancelled"`, a network
+failure (refused, reset, unreachable, DNS, TLS) kind `"net"`, the
+`net.NetError` that `http` threw. A JSON answer nested past the decoder's caps
+is kind `"limit"` too. A `c`
 argument is a `Client`; a `ref` is a container's (network's, image's) id or
 name; `filters` are `name=value` strings such as `label=app=web`; a `query`
 is a `list of string` of `name=value` parameters. Calls other than

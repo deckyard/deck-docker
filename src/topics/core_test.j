@@ -460,15 +460,65 @@ func testCapsAndDeadlines() {
         testing.assertEqual($e.message, "docker: info: no answer within 1000 ms");
     }
     stopFake($f);
-    # nothing listens: kind docker, status 0
+    # nothing listens: net's NetError, passed on with its fields
     try {
         info($c);
         missed("a stopped daemon");
     } catch (e) {
-        testing.assertEqual($e.kind, "docker");
-        testing.assertEqual($e.status, 0);
-        testing.assertContains($e.message, "info: cannot reach");
+        testing.assertEqual($e.kind, "net");
+        def ne as net.NetError init $e;
+        testing.assertEqual($ne.reason, "refused");
+        testing.assertEqual($ne.op, "connect");
+        testing.assertFalse($ne.sent);
     }
+}
+
+# A daemon that resets the connection: the NetError reaches the caller as
+# net threw it, with what http knew about the exchange.
+func testNetErrorsPassOn() {
+    def server as net.Listener init net.listen("127.0.0.1:0");
+    def address as string init net.address($server);
+    def daemon as task of bool init spawn {
+        def conn as net.Conn init net.accept($server);
+        net.readBytes($conn, 4096);
+        net.abort($conn);
+        return true;
+    };
+    def c as Client init withApiVersion(client("tcp://" + $address), "1.56");
+    try {
+        info($c);
+        missed("a reset");
+    } catch (e) {
+        testing.assertEqual($e.kind, "net");
+        def ne as net.NetError init $e;
+        testing.assertEqual($ne.reason, "reset");
+        testing.assertFalse($ne.replied);
+    }
+    task.wait($daemon);
+    net.close($server);
+}
+
+# The JSON decoder's caps are a reached cap: kind "limit", not "docker".
+func testDecoderCapsAreLimits() {
+    def deep as string init strings.repeat("[", 5000) + strings.repeat("]", 5000);
+    def f as Fake init startFake({
+        "GET /v1.56/info": answer(200, $deep),
+        "POST /v1.56/images/create?fromImage=busybox&tag=deep": answer(200, $deep + "\n")
+    });
+    try {
+        info(fakeClient($f));
+        missed("a reply nested too deep");
+    } catch (e) {
+        testing.assertEqual($e.kind, "limit");
+        testing.assertContains($e.message, "docker: info: ");
+    }
+    try {
+        pull(fakeClient($f), "busybox:deep", "");
+        missed("a progress line nested too deep");
+    } catch (e) {
+        testing.assertEqual($e.kind, "limit");
+    }
+    stopFake($f);
 }
 
 func testCredentialsAreSent() {

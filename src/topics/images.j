@@ -111,6 +111,10 @@ func progressLines(r as http.BytesResponse, what as string) {
         try {
             $v = json.decode($t);
         } catch (e) {
+            # the decoder's nesting and node caps are a reached cap, kind "limit"
+            if ($e.kind == "limit") {
+                failLimit($what + ": " + cleaned($e.message, 300));
+            }
             fail($what + ": a progress line is not JSON: " + shown($t));
         }
         if (json.typeOf($v) != "map") {
