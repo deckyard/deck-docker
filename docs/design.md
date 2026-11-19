@@ -89,7 +89,13 @@ detail}`:
 
 - `status`: the HTTP status; 200 for an error inside a successful answer (a
   pull or build `error` line, a wait result's error, a log frame of stream
-  3); 0 when there was no answer (local validation).
+  3); 0 when the deck raised the error itself, with no HTTP status to
+  report: a refused argument or address (nothing was sent), an API version
+  `negotiate` cannot use, a 2xx answer it cannot use (not UTF-8 or JSON, a
+  field of the wrong type, no id, a broken log frame or progress line), a
+  build context it cannot pack, or an `http` failure of a kind other than
+  the generic ones below. A daemon that cannot be reached never gives
+  status 0: that is kind `"net"`.
 - `detail`: the daemon's own explanation, its JSON `message` or the plain
   text body (a client version refused before routing comes as text).
 

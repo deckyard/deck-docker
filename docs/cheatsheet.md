@@ -11,8 +11,9 @@ import "@deckyard/docker/" as docker;
 ```
 
 Every failure of kind `"docker"` is a `DockerError` with the HTTP `status`
-(0 when there was no answer, 200 when the daemon reported the error inside a
-2xx answer) and the daemon's own `detail`; a response over a cap is kind
+(200 when the daemon reported the error inside a 2xx answer; 0 when the deck
+raised it itself: a refused argument, an unusable answer, a non-generic
+`http` failure, never a network failure) and the daemon's own `detail`; a response over a cap is kind
 `"limit"`, a deadline that passed kind `"timeout"`, a connection closed
 mid-answer kind `"closed"`, a cancelled task kind `"cancelled"`, a network
 failure (refused, reset, unreachable, DNS, TLS) kind `"net"`, the
@@ -153,7 +154,7 @@ is a `list of string` of `name=value` parameters. Calls other than
 |---|---|
 | `kind as string` | always `"docker"` |
 | `message as string` | `docker: <request>: <why>`, with ` (HTTP nnn)` for an error status |
-| `status as int` | the HTTP status; 200 for an error inside a 2xx answer; 0 without an answer |
+| `status as int` | the HTTP status; 200 for an error inside a 2xx answer; 0 when the deck raised it itself (a refused argument, an unusable answer, a non-generic `http` failure); never a network failure (kind `"net"`) |
 | `detail as string` | the daemon's own message, `""` when none |
 
 ### `ContainerSpec`

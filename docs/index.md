@@ -85,8 +85,13 @@ Every failure of kind `"docker"` is a `docker.DockerError`: a request the
 daemon refused (`status` is its HTTP status, `detail` Docker's own
 `message`), an error the daemon reported inside a 2xx answer (a pull or
 build that failed part way, a wait that ended in an error: `status` 200),
-a malformed answer, an argument the deck refuses before sending (`status`
-0). The generic kinds pass through: a response over a cap (or a JSON answer
+or an error the deck raised itself (`status` 0). Status 0 covers an
+argument or address refused before sending, an API version `negotiate`
+cannot use, a 2xx answer the deck cannot use (not JSON, no id, a broken
+log frame), a build context it cannot pack, and an `http` failure of a
+kind other than the generic ones; it never means the daemon was
+unreachable, and most of it is final whatever you repeat. The generic
+kinds pass through: a response over a cap (or a JSON answer
 nested past the decoder's caps) is `"limit"`, a deadline that passed
 `"timeout"`, a connection closed mid-answer `"closed"`, a cancelled task
 `"cancelled"`, and a daemon the deck cannot reach (refused, reset,

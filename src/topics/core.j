@@ -119,7 +119,7 @@ export def struct Client {
  *
  * @field kind {string} always "docker"
  * @field message {string} `docker: <request>: <why>`, with ` (HTTP nnn)` when the daemon answered with an error status
- * @field status {int} the HTTP status of the answer (404, 409, 500, ...); 200 when the daemon reported the error inside a 2xx answer (a pull, build or wait); 0 when there was no answer (a refused argument, a transport failure that is not a network error)
+ * @field status {int} the HTTP status of the answer (404, 409, 500, ...); 200 when the daemon reported the error inside a 2xx answer (a pull, build or wait); 0 when the deck raised the error itself: a refused argument or address (nothing was sent), an API version `negotiate` cannot use, a 2xx answer it cannot use, a build context it cannot pack, or an `http` failure of a non-generic kind. Never a network failure, which is kind "net"
  * @field detail {string} the daemon's own explanation, its JSON `message` (or `error`), `""` when there was none
  */
 export def struct DockerError {
@@ -130,7 +130,8 @@ export def struct DockerError {
 };
 
 /**
- * Throw a docker error that has no answer behind it: status 0.
+ * Throw a docker error the deck raises itself, with no HTTP status to
+ * report: status 0.
  *
  * @param message {string} what went wrong, without the `docker: ` prefix
  * @throws {DockerError} kind "docker", always
