@@ -64,7 +64,6 @@ import "http.j" as http;
 import "ipnet.j" as ipnet;
 import "uri.j" as uri;
 
-include "topics/version.j";
 include "topics/core.j";
 include "topics/containers.j";
 include "topics/images.j";

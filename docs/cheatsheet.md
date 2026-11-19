@@ -29,7 +29,6 @@ is a `list of string` of `name=value` parameters. Calls other than
 
 | Constant | Value | Meaning |
 |---|---|---|
-| `VERSION` | `"0.1.0"` | this deck's version |
 | `DEFAULT_TIMEOUT_MS` | `30000` | the deadline of an ordinary request |
 | `DEFAULT_LONG_TIMEOUT_MS` | `1800000` | the deadline of a pull, build or wait |
 | `DEFAULT_MAX_BYTES` | `16777216` | the largest JSON response read |
