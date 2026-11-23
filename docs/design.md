@@ -148,8 +148,10 @@ retries it. A JSON answer nested past the decoder's caps is `"limit"`.
 
 ## Dependencies on the interpreter
 
-Floor `>=0.26.0`, capability `net`; it uses the bundled `http`, `ipnet` and
-`uri` modules and `archive`. Waiting on `jennifer`'s milestones: M30.9
+Floor `>=0.27.0`, capability `net`, for the UTF-8 codecs of
+`encoding.encode` / `decode`, `strings.replicate` and
+`testing.assertThrowsArgs`. It uses the bundled `http`, `ipnet` and `uri`
+modules and `archive`. Waiting on `jennifer`'s milestones: M30.9
 (streaming responses) for live streams, and M30.15 plus `http` over a Unix
 socket for the daemon's socket. M28.57 (the error conventions) shapes
 `DockerError` and the generic kinds; M28.65 (transport failures as

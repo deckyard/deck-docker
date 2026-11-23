@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LGPL-3.0-only
 # SPDX-FileCopyrightText: Copyright (C) 2026 mplx <mplx@jennifer-lang.dev>
-# pragma-jennifer-version: >=0.26.0
+# pragma-jennifer-version: >=0.27.0
 
 # docker - white-box tests for the core topic, and the fake daemon the other
 # overlays use. Spliced into docker_test.j via include.
@@ -32,8 +32,8 @@ func missed(what as string) {
  * Start a fake daemon. An answer is looked up by `METHOD path?query`, then
  * `METHOD path`; it is the status, a newline, header lines `Name: value`, an
  * empty line and the body. A request with no answer gets 404 and
- * `{"message": ...}` as Docker words it; an answer whose status is `SLEEP`
- * waits 3 seconds; a body `hex:<digits>` is sent as those bytes.
+ * `{"message": ...}` as Docker words it; an answer whose status is
+ * `SLEEP <ms>` waits that long; a body `hex:<digits>` is sent as those bytes.
  *
  * @param answers {map of string to string} the answers
  * @return {Fake} the server
@@ -56,11 +56,11 @@ func startFake(answers as map of string to string) {
  */
 func seenBody(req as httpd.Request) {
     if (httpd.header($req, "Content-Type") != "application/x-tar") {
-        return convert.stringFromBytes("utf-8", httpd.body($req));
+        return encoding.decode("utf-8", httpd.body($req));
     }
     def parts as list of string init [];
     for (def e in archive.unpack("tar", httpd.body($req))) {
-        $parts[] = $e.name + "=" + convert.stringFromBytes("utf-8", $e.data);
+        $parts[] = $e.name + "=" + encoding.decode("utf-8", $e.data);
     }
     return "tar:" + strings.join($parts, ";");
 }
@@ -107,8 +107,8 @@ func serveFake(srv as httpd.Server, answers as map of string to string) {
             def at as int init strings.indexOf($h, ": ");
             httpd.setHeader($req, $h[..$at], $h[$at + 2..]);
         }
-        if ($head[0] == "SLEEP") {
-            time.sleep(time.fromMilliseconds(3000));
+        if (strings.startsWith($head[0], "SLEEP ")) {
+            time.sleep(time.fromMilliseconds(convert.toInt($head[0][len("SLEEP ")..])));
             httpd.respond($req, 200, '{}');
         } elseif (strings.startsWith($spec[$split + 2..], "hex:")) {
             httpd.respond(
@@ -249,7 +249,7 @@ func testSettings() {
     testing.assertEqual(withToken($c, "s3cr3t-T0ken").authorization, "Bearer s3cr3t-T0ken");
     testing.assertEqual(withBasicAuth($c, "ops", "pw").authorization, http.basic("ops", "pw"));
     def r as Client init withRegistryAuth($c, "registry.example.org", "ops", "pass word");
-    def auth as string init convert.stringFromBytes(
+    def auth as string init encoding.decode(
         "utf-8",
         encoding.fromText("base64-url", $r.registryAuth));
     testing.assertEqual(
@@ -281,7 +281,7 @@ func testSettings() {
     } catch (e) {
         testing.assertContains($e.message, "the largest log or progress output must be");
     }
-    for (def bad in ["", "a b", "x\ny", strings.repeat("t", 4097)]) {
+    for (def bad in ["", "a b", "x\ny", strings.replicate("t", 4097)]) {
         try {
             withToken($c, $bad);
             missed($bad);
@@ -433,14 +433,14 @@ func testDockerErrorIsAStruct() {
     } catch (e) {
         testing.assertEqual(statusOf($e), 0);
     }
-    testing.assertThrowsWith("fail", ["x"], "docker");
+    testing.assertThrowsArgs("fail", ["x"], "docker");
 }
 
 func testCapsAndDeadlines() {
-    def big as string init '{"Volumes":[],"Warnings":["' + strings.repeat("w", 70000) + '"]}';
+    def big as string init '{"Volumes":[],"Warnings":["' + strings.replicate("w", 70000) + '"]}';
     def f as Fake init startFake({
         "GET /v1.56/volumes": answer(200, $big),
-        "GET /v1.56/info": "SLEEP\n\n"
+        "GET /v1.56/info": "SLEEP 1250\n\n"
     });
     def c as Client init withMaxBytes(fakeClient($f), 65536);
     try {
@@ -500,7 +500,7 @@ func testNetErrorsPassOn() {
 
 # The JSON decoder's caps are a reached cap: kind "limit", not "docker".
 func testDecoderCapsAreLimits() {
-    def deep as string init strings.repeat("[", 5000) + strings.repeat("]", 5000);
+    def deep as string init strings.replicate("[", 5000) + strings.replicate("]", 5000);
     def f as Fake init startFake({
         "GET /v1.56/info": answer(200, $deep),
         "POST /v1.56/images/create?fromImage=busybox&tag=deep": answer(200, $deep + "\n")
@@ -534,7 +534,7 @@ func testChecksOfNamesAndRefs() {
     checkRef("web", "a container");
     checkRef("8b7f57df0af4", "a container");
     checkRef("shop_web.1-a", "a container");
-    for (def bad in ["", "-x", "a/b", "a b", "../x", strings.repeat("x", 256)]) {
+    for (def bad in ["", "-x", "a/b", "a b", "../x", strings.replicate("x", 256)]) {
         try {
             checkRef($bad, "a container");
             missed($bad);
@@ -603,7 +603,7 @@ func testChecksOfNamesAndRefs() {
         "x.": "1",
         "k": "line one\nline two\ttabbed"
     });
-    for (def bad in ["", "a\nb", "a\u0000b", strings.repeat("k", 4097)]) {
+    for (def bad in ["", "a\nb", "a\u0000b", strings.replicate("k", 4097)]) {
         try {
             checkLabels({$bad: "1"});
             missed($bad);
@@ -757,5 +757,5 @@ func testJsonReaders() {
         testing.assertContains($e.message, "not a map");
     }
     testing.assertEqual(cleaned("a\u001b[31mb\u202ec", 100), "a?[31mb?c");
-    testing.assertEqual(cleaned(strings.repeat("x", 10), 4), "xxxx...");
+    testing.assertEqual(cleaned(strings.replicate("x", 10), 4), "xxxx...");
 }

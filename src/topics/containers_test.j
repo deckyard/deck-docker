@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LGPL-3.0-only
 # SPDX-FileCopyrightText: Copyright (C) 2026 mplx <mplx@jennifer-lang.dev>
-# pragma-jennifer-version: >=0.26.0
+# pragma-jennifer-version: >=0.27.0
 
 # docker - white-box tests for the containers topic. Spliced into
 # docker_test.j via include.
@@ -250,10 +250,10 @@ func testLifecycle() {
 
 func testStopOwnGrace() {
     # -1 reads the container's own grace period: StopTimeout 0 leaves the
-    # client's timeout alone as the deadline, so a stop that takes 3 s fails
+    # client's timeout alone as the deadline, so a stop that takes 1.3 s fails
     def f as Fake init startFake({
         "GET /v1.56/containers/quick/json": answer(200, '{"Id":"x","Config":{"StopTimeout":0}}'),
-        "POST /v1.56/containers/quick/stop": "SLEEP\n\n"
+        "POST /v1.56/containers/quick/stop": "SLEEP 1250\n\n"
     });
     def c as Client init withTimeout(fakeClient($f), 1000);
     try {
@@ -384,19 +384,17 @@ func testListAndInspect() {
 }
 
 func testLogFraming() {
-    def b as bytes init convert.bytesFromString(
+    def b as bytes init encoding.encode(
         "utf-8",
         frame(1, "out\n") + frame(2, "err\n") + frame(1, "two\n"));
     def frames as list of LogFrame init demux($b, "logs");
     testing.assertEqual(len($frames), 3);
     testing.assertEqual($frames[0].stream, "stdout");
-    testing.assertEqual(convert.stringFromBytes("utf-8", $frames[1].data), "err\n");
+    testing.assertEqual(encoding.decode("utf-8", $frames[1].data), "err\n");
     testing.assertEqual($frames[1].stream, "stderr");
-    testing.assertEqual(
-        demux(convert.bytesFromString("utf-8", frame(0, "in")), "logs")[0].stream,
-        "stdin");
-    testing.assertEqual(len(demux(convert.bytesFromString("utf-8", frame(1, "")), "logs")), 1);
-    testing.assertEqual(demux(convert.bytesFromString("utf-8", ""), "logs"), []);
+    testing.assertEqual(demux(encoding.encode("utf-8", frame(0, "in")), "logs")[0].stream, "stdin");
+    testing.assertEqual(len(demux(encoding.encode("utf-8", frame(1, "")), "logs")), 1);
+    testing.assertEqual(demux(encoding.encode("utf-8", ""), "logs"), []);
     for (def bad in [
         frame(1, "out")[..5],
         frame(1, "out")[..9],
@@ -405,7 +403,7 @@ func testLogFraming() {
         "\u0001\u0000\u0001\u0000\u0000\u0000\u0000\u0001x"
     ]) {
         try {
-            demux(convert.bytesFromString("utf-8", $bad), "logs");
+            demux(encoding.encode("utf-8", $bad), "logs");
             missed($bad);
         } catch (e) {
             testing.assertEqual($e.kind, "docker");
@@ -414,7 +412,7 @@ func testLogFraming() {
     }
     try {
         demux(
-            convert.bytesFromString("utf-8", frame(1, "ok\n") + frame(3, "read error")),
+            encoding.encode("utf-8", frame(1, "ok\n") + frame(3, "read error")),
             "logs of \"web\"");
         missed("a daemon error frame");
     } catch (e) {
@@ -473,9 +471,9 @@ func testLogs() {
 }
 
 func testLogCap() {
-    def chunk as string init frame(1, strings.repeat("x", 100));
+    def chunk as string init frame(1, strings.replicate("x", 100));
     def f as Fake init startFake({
-        "GET /v1.56/containers/big/logs": muxed(strings.repeat($chunk, 700))
+        "GET /v1.56/containers/big/logs": muxed(strings.replicate($chunk, 700))
     });
     def c as Client init withMaxStreamBytes(fakeClient($f), 65536);
     try {

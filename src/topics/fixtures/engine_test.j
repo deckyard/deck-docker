@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LGPL-3.0-only
 # SPDX-FileCopyrightText: Copyright (C) 2026 mplx <mplx@jennifer-lang.dev>
-# pragma-jennifer-version: >=0.26.0
+# pragma-jennifer-version: >=0.27.0
 
 # docker - recorded Engine API replies for the fake, from Docker 29.9.3 (API
 # 1.56) on 2026-11-14; long answers trimmed to the fields the deck reads,

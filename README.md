@@ -58,7 +58,7 @@ streaming responses.
 
 ## Requirements
 
-Jennifer 0.26.0 or newer, with the `net` capability (the default binary;
+Jennifer 0.27.0 or newer, with the `net` capability (the default binary;
 not `jennifer-tiny`). A Docker daemon speaking Engine API 1.41 or later
 (Docker 20.10 and newer; Podman 6.2's service reports 1.44), reachable over
 TCP or an https proxy.

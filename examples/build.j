@@ -1,7 +1,7 @@
 #!/usr/bin/env -S jennifer run
 # SPDX-License-Identifier: LGPL-3.0-only
 # SPDX-FileCopyrightText: Copyright (C) 2026 mplx <mplx@jennifer-lang.dev>
-# pragma-jennifer-version: >=0.26.0
+# pragma-jennifer-version: >=0.27.0
 
 /**
  * build example: build an image from files made in memory, run it once,
@@ -13,7 +13,7 @@
  */
 
 use archive;
-use convert;
+use encoding;
 use io;
 use os;
 
@@ -27,12 +27,7 @@ import "../src/docker.j" as docker;
  * @return {archive.Entry} the file
  */
 func file(name as string, text as string) {
-    return archive.Entry{
-        name: $name,
-        data: convert.bytesFromString("utf-8", $text),
-        mode: 0o644,
-        mtime: 0
-    };
+    return archive.Entry{name: $name, data: encoding.encode("utf-8", $text), mode: 0o644, mtime: 0};
 }
 
 def args as list of string init os.ARGS;

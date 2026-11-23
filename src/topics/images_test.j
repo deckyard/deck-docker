@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LGPL-3.0-only
 # SPDX-FileCopyrightText: Copyright (C) 2026 mplx <mplx@jennifer-lang.dev>
-# pragma-jennifer-version: >=0.26.0
+# pragma-jennifer-version: >=0.27.0
 
 # docker - white-box tests for the images topic. Spliced into docker_test.j
 # via include.
@@ -23,12 +23,7 @@ func progress(body as string) {
  * @return {archive.Entry} the entry
  */
 func file(name as string, text as string) {
-    return archive.Entry{
-        name: $name,
-        data: convert.bytesFromString("utf-8", $text),
-        mode: 0o644,
-        mtime: 0
-    };
+    return archive.Entry{name: $name, data: encoding.encode("utf-8", $text), mode: 0o644, mtime: 0};
 }
 
 func testPull() {
@@ -134,11 +129,11 @@ func testProgressLines() {
         status: 200,
         statusText: "OK",
         headers: {},
-        body: convert.bytesFromString("utf-8", '{"status":"a"}' + "\n\n" + '{"stream":"b"}' + "\n")
+        body: encoding.encode("utf-8", '{"status":"a"}' + "\n\n" + '{"stream":"b"}' + "\n")
     };
     testing.assertEqual(len(progressLines($r, "pull")), 2);
     for (def bad in ['{"status":"a"}' + "\nnot json\n", '["a"]']) {
-        $r.body = convert.bytesFromString("utf-8", $bad);
+        $r.body = encoding.encode("utf-8", $bad);
         try {
             progressLines($r, "pull");
             missed($bad);
@@ -146,7 +141,7 @@ func testProgressLines() {
             testing.assertContains($e.message, "docker: pull: a progress line is not");
         }
     }
-    $r.body = convert.bytesFromString("utf-8", '{"error":"no space left on device"}');
+    $r.body = encoding.encode("utf-8", '{"error":"no space left on device"}');
     try {
         progressLines($r, "pull");
         missed("an error line without errorDetail");
@@ -154,7 +149,7 @@ func testProgressLines() {
         testing.assertEqual($e.detail, "no space left on device");
     }
     # Podman ends a failed step with a newline, which a message would show as ?
-    $r.body = convert.bytesFromString(
+    $r.body = encoding.encode(
         "utf-8",
         '{"stream":"STEP 2/2: RUN exit 7\n"}' + "\n" +
             '{"error":"building at STEP \"RUN exit 7\": exit status 7\n"}' + "\n");

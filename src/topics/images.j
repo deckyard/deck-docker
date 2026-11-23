@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LGPL-3.0-only
 # SPDX-FileCopyrightText: Copyright (C) 2026 mplx <mplx@jennifer-lang.dev>
-# pragma-jennifer-version: >=0.26.0
+# pragma-jennifer-version: >=0.27.0
 
 # docker - images: pull, tag, remove, build (a tar context from `archive`),
 # lists and inspection, and the JSON-lines progress that pull and build
@@ -97,7 +97,7 @@ export def struct Built {
 func progressLines(r as http.BytesResponse, what as string) {
     def text as string init "";
     try {
-        $text = convert.stringFromBytes("utf-8", $r.body);
+        $text = encoding.decode("utf-8", $r.body);
     } catch (e) {
         fail($what + ": the progress output is not UTF-8");
     }
@@ -169,7 +169,7 @@ export func pull(c as Client, ref as string, platform as string) {
         "POST",
         apiPath($c, "/images/create" + queryOf($query), true),
         "",
-        convert.bytesFromString("utf-8", ""),
+        encoding.encode("utf-8", ""),
         $c.maxStreamBytes,
         $c.longTimeoutMs,
         $what);
@@ -419,7 +419,7 @@ export func inspectImage(c as Client, ref as string) {
  * @throws {DockerError} kind "docker" when the context is empty, a name is malformed, or the build fails (status 200, the failing step in `detail`)
  * @throws {Error} kind "timeout" when it takes longer than the long timeout; kind "limit" when the output is over the stream cap
  * @example
- *   def ctx as list of archive.Entry init [archive.Entry{name: "Dockerfile", data: convert.bytesFromString("utf-8", "FROM alpine:3.22\n"), mode: 0o644, mtime: 0}];
+ *   def ctx as list of archive.Entry init [archive.Entry{name: "Dockerfile", data: encoding.encode("utf-8", "FROM alpine:3.22\n"), mode: 0o644, mtime: 0}];
  *   def b as docker.Built init docker.build($c, $ctx, "example/app:1", {}, []);
  */
 export func build(

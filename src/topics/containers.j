@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LGPL-3.0-only
 # SPDX-FileCopyrightText: Copyright (C) 2026 mplx <mplx@jennifer-lang.dev>
-# pragma-jennifer-version: >=0.26.0
+# pragma-jennifer-version: >=0.27.0
 
 # docker - containers: the spec a container is created from, the lifecycle
 # (create, start, stop, restart, kill, remove, wait), lists and inspection,
@@ -782,7 +782,7 @@ export func waitContainer(c as Client, ref as string, condition as string) {
         "POST",
         apiPath($c, "/containers/" + $ref + "/wait?condition=" + $condition, true),
         "",
-        convert.bytesFromString("utf-8", ""),
+        encoding.encode("utf-8", ""),
         $c.maxBytes,
         $c.longTimeoutMs,
         $what);
@@ -956,7 +956,7 @@ func demux(data as bytes, what as string) {
         if ($kind == 3) {
             def text as string init "an error";
             try {
-                $text = convert.stringFromBytes("utf-8", $piece);
+                $text = encoding.decode("utf-8", $piece);
             } catch (e) {
                 $text = "an error that is not UTF-8";
             }
@@ -1022,7 +1022,7 @@ func readLogs(c as Client, ref as string, query as list of string) {
         "GET",
         apiPath($c, "/containers/" + $ref + "/logs" + queryOf(logQuery($query)), true),
         "",
-        convert.bytesFromString("utf-8", ""),
+        encoding.encode("utf-8", ""),
         $c.maxStreamBytes,
         $c.timeoutMs,
         $what);
@@ -1100,8 +1100,8 @@ export func logs(c as Client, ref as string, query as list of string) {
     }
     try {
         return Logs{
-            stdout: convert.stringFromBytes("utf-8", binary.join($out)),
-            stderr: convert.stringFromBytes("utf-8", binary.join($err)),
+            stdout: encoding.decode("utf-8", binary.join($out)),
+            stderr: encoding.decode("utf-8", binary.join($err)),
             tty: $tty
         };
     } catch (e) {

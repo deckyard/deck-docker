@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: LGPL-3.0-only
 # SPDX-FileCopyrightText: Copyright (C) 2026 mplx <mplx@jennifer-lang.dev>
-# pragma-jennifer-version: >=0.26.0
+# pragma-jennifer-version: >=0.27.0
 
 # docker - core: the client, its address and settings, the API version, the
 # HTTP exchange with its deadlines and caps, errors, input checks, JSON
@@ -620,9 +620,7 @@ export func withRegistryAuth(
         "password": $password,
         "serveraddress": $server
     });
-    $c.registryAuth = encoding.toText(
-        "base64-url",
-        convert.bytesFromString("utf-8", json.encode($auth)));
+    $c.registryAuth = encoding.toText("base64-url", encoding.encode("utf-8", json.encode($auth)));
     return $c;
 }
 
@@ -845,7 +843,7 @@ func exchange(
                 status: $r.status,
                 statusText: $r.statusText,
                 headers: $r.headers,
-                body: convert.bytesFromString("utf-8", $r.body)
+                body: encoding.encode("utf-8", $r.body)
             };
         }
         return http.requestWithBytes($method, $url, $headers, $body, $deadlineMs, $maxBytes, $tls);
@@ -893,7 +891,7 @@ func exchange(
  */
 func errorDetail(r as http.BytesResponse) {
     try {
-        def text as string init strings.trim(convert.stringFromBytes("utf-8", $r.body));
+        def text as string init strings.trim(encoding.decode("utf-8", $r.body));
         if ($text == "" or strings.startsWith($text, "<")) {
             return "";
         }
@@ -946,7 +944,7 @@ func checkStatus(r as http.BytesResponse, what as string) {
 func jsonBody(r as http.BytesResponse, what as string) {
     def text as string init "";
     try {
-        $text = convert.stringFromBytes("utf-8", $r.body);
+        $text = encoding.decode("utf-8", $r.body);
     } catch (e) {
         fail($what + ": the response is not UTF-8");
     }
@@ -988,7 +986,7 @@ func request(
         $method,
         apiPath($c, $path, $versioned),
         $body,
-        convert.bytesFromString("utf-8", ""),
+        encoding.encode("utf-8", ""),
         $c.maxBytes,
         $c.timeoutMs,
         $what);
@@ -1020,7 +1018,7 @@ func command(
         $method,
         apiPath($c, $path, true),
         $body,
-        convert.bytesFromString("utf-8", ""),
+        encoding.encode("utf-8", ""),
         $c.maxBytes,
         $deadlineMs,
         $what);
