@@ -25,7 +25,7 @@ on it, as anyone in the `docker` group always has.
 def c as docker.Client init docker.negotiate(docker.client("tcp://127.0.0.1:2375"));
 ```
 
-For Podman, `podman system service --time=0 tcp://127.0.0.1:2375` serves
+For Podman™, `podman system service --time=0 tcp://127.0.0.1:2375` serves
 the same API on loopback.
 
 ## Elsewhere
@@ -56,7 +56,7 @@ on a network where every host may be root on the daemon's machine.
 ## The API version
 
 The Engine API is versioned in the path (`/v1.47/containers/json`), and a
-daemon serves a range of versions: Docker 29 speaks 1.40 to 1.56 (Docker
+daemon serves a range of versions: Docker™ 29 speaks 1.40 to 1.56 (Docker
 29 dropped everything older than 1.40), Podman 6.2's compatible service
 reports 1.44 (older Podman releases report less). A fixed version would fail on one or the other, so the deck
 negotiates, as the `docker` command does:

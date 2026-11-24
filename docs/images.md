@@ -14,10 +14,10 @@ io.printf("%s (%s)\n", $p.status, $p.digest);
 up to the long timeout. The daemon reports progress as JSON lines; the
 deck reads them once the pull ends and returns the last status
 (`Status: Downloaded newer image for busybox:1.37`, or `... Image is up to
-date ...`) and the digest. Podman sends neither line: the status is then
+date ...`) and the digest. Podman™ sends neither line: the status is then
 `pulled`, and the deck inspects the image once for the digest (the first
 `RepoDigests` entry of the repository, the platform's manifest where
-Docker names the index; both pull the same image). A reference without a tag pulls `latest`: the
+Docker™ names the index; both pull the same image). A reference without a tag pulls `latest`: the
 API would otherwise fetch every tag of the repository. A digest
 (`app@sha256:...`) pulls exactly that manifest. The second argument picks
 a platform (`linux/arm64`), `""` for the daemon's own.

@@ -43,7 +43,7 @@ $spec = docker.withExtra($spec, json.decode('{"HostConfig": {"Memory": 268435456
 | `startContainer(c, ref)` | `POST /containers/{ref}/start` | false when it already ran |
 | `stopContainer(c, ref, seconds)` | `POST /containers/{ref}/stop?t=` | false when it was stopped; -1 for the container's own grace period |
 | `restartContainer(c, ref, seconds)` | `POST /containers/{ref}/restart?t=` | |
-| `killContainer(c, ref, signal)` | `POST /containers/{ref}/kill?signal=` | 409 when it is not running; an unknown signal Docker 400, Podman 500 |
+| `killContainer(c, ref, signal)` | `POST /containers/{ref}/kill?signal=` | 409 when it is not running; an unknown signal Docker™ 400, Podman™ 500 |
 | `waitContainer(c, ref, condition)` | `POST /containers/{ref}/wait` | the exit code; up to the long timeout |
 | `removeContainer(c, ref, force, volumes)` | `DELETE /containers/{ref}` | a running one without `force`: Docker 409, Podman 500 |
 

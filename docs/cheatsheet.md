@@ -272,7 +272,7 @@ is a `list of string` of `name=value` parameters. Calls other than
 | `containerId as string` | its container |
 | `running as bool` | whether it runs |
 | `exitCode as int` | its exit code once it ended |
-| `pid as int` | its process on the host (Podman: 0 once it ended) |
+| `pid as int` | its process on the host (Podman™: 0 once it ended) |
 | `cmd as list of string` | the command |
 | `raw as json.Value` | the whole answer |
 
@@ -312,7 +312,7 @@ is a `list of string` of `name=value` parameters. Calls other than
 |---|---|
 | `image as string` | the reference pulled, with its tag |
 | `digest as string` | the manifest digest: from the progress, the reference, or one image inspect (Podman); `""` when none has it |
-| `status as string` | Docker's last `Status:` line; `pulled` when there was none (Podman) |
+| `status as string` | Docker™'s last `Status:` line; `pulled` when there was none (Podman) |
 | `lines as int` | progress lines received |
 
 ### `Built`

@@ -5,7 +5,7 @@
 
 ## Scope
 
-A client for the Docker Engine API, and for Podman's compatible service:
+A client for the Docker™ Engine API, and for Podman™'s compatible service:
 containers (create, start, stop, kill, remove, wait, logs, one-shot stats),
 images (pull, tag, remove, build), networks, volumes, detached exec, and
 system calls (info, version, ping, prune). The API is documented, versioned

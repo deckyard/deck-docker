@@ -3,9 +3,9 @@
 
 # @deckyard/docker
 
-A client for the [Docker Engine API](https://docs.docker.com/reference/api/engine/),
+A client for the [Docker™ Engine API](https://docs.docker.com/reference/api/engine/),
 the versioned REST / JSON API the `docker` command itself talks to, and
-which Podman's compatible service serves too. A Jennifer program can run
+which Podman™'s compatible service serves too. A Jennifer program can run
 throwaway containers, build and pull images, read logs and a stats sample,
 and look after networks and volumes without shelling out to `docker`.
 
@@ -138,3 +138,11 @@ responses (M30.9). Exec output needs the hijacked connection of
 `exec/start`, so `exec` runs detached and `waitExec` reports the exit
 code; `attach` waits for the same. Compose is client-side, not part of the
 Engine API.
+
+## Trademarks
+
+Docker™ is a trademark of Docker, Inc. Other product and company names, such
+as Podman™, may be trademarks of their respective owners. They are used only
+to identify the products this deck works with. This deck is an independent
+project, not affiliated with, sponsored or endorsed by Docker, Inc. or the
+Podman project.

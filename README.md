@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-github%20pages-blue)](https://deckyard.github.io/deck-docker/)
 [![release](https://img.shields.io/github/v/release/deckyard/deck-docker)](https://github.com/deckyard/deck-docker/releases/latest)
 
-A client for the Docker Engine API (and Podman's compatible one) for
+A client for the Docker™ Engine API (and Podman™'s compatible one) for
 [Jennifer](https://jennifer-lang.dev/) programs: create, start, stop, kill,
 wait for and remove containers, read their logs and a stats sample; pull,
 tag, build and remove images; networks, volumes, detached exec, ping,
@@ -74,6 +74,14 @@ tools/pack.sh dist                   # build the release archive
 
 The suite runs against a loopback fake with Docker's recorded replies; CI
 only parse-checks the examples, which need a daemon.
+
+## Trademarks
+
+Docker™ is a trademark of Docker, Inc. Other product and company names, such
+as Podman™, may be trademarks of their respective owners. They are used only
+to identify the products this deck works with. This deck is an independent
+project, not affiliated with, sponsored or endorsed by Docker, Inc. or the
+Podman project.
 
 ## Licence
 

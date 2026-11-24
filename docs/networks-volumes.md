@@ -19,7 +19,7 @@ later with `connectNetwork`; `aliases` are more names it answers to there.
 `networks` lists them without their containers (the daemon leaves those
 out of a list); `inspectNetwork` has them, as container ids. A name that
 is taken is a `DockerError` with status 409; removing a network a
-container is still on is refused too (Docker 403, Podman 500), and so is
+container is still on is refused too (Docker™ 403, Podman™ 500), and so is
 disconnecting a container that is not on it (500 from both).
 
 ## Volumes
