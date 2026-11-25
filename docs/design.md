@@ -148,7 +148,7 @@ retries it. A JSON answer nested past the decoder's caps is `"limit"`.
 
 ## Dependencies on the interpreter
 
-Floor `>=0.27.0`, capability `net`, for the UTF-8 codecs of
+Floor `>=0.28.0` (the calls 0.29.0 removes are replaced by their 0.28.0 forms), capability `net`, for the UTF-8 codecs of
 `encoding.encode` / `decode`, `strings.replicate` and
 `testing.assertThrowsArgs`. It uses the bundled `http`, `ipnet` and `uri`
 modules and `archive`. Waiting on `jennifer`'s milestones: M30.9
